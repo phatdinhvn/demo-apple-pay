@@ -9,5 +9,20 @@
 		"directory": ".svelte-kit/cloudflare"
 	},
 	"workers_dev": true,
-	"preview_urls": true
+	"preview_urls": true,
+	"vars": {
+		"APPLE_PAY_MERCHANT_ID": "merchant.io.pphome.demo",
+		"APPLE_PAY_DOMAIN": "demo-apple-pay.pphome.workers.dev",
+		"APPLE_PAY_DISPLAY_NAME": "Apple Pay Demo"
+	},
+	// Merchant Identity Certificate (mic.pem + mic.key), uploaded with:
+	//   bunx wrangler mtls-certificate upload --cert mic.pem --key mic.key --name apple-pay-merchant
+	"mtls_certificates": [
+		{
+			"binding": "APPLE_PAY_CERT",
+			"certificate_id": "e53afd69-2bd6-4e5b-aaa7-7746ed1487c4"
+		}
+	]
+	// Secret (not in this file): APPLE_PAY_PPC_PRIVATE_KEY = contents of ppc.pkcs8.pem
+	//   bunx wrangler secret put APPLE_PAY_PPC_PRIVATE_KEY < ppc.pkcs8.pem
 }

@@ -6,7 +6,12 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		// interface PageState {}
-		// interface Platform {}
+		interface Platform {
+			env: Env & {
+				/** PKCS#8 PEM of the Payment Processing Certificate private key (wrangler secret). */
+				APPLE_PAY_PPC_PRIVATE_KEY: string;
+			};
+		}
 	}
 }
 
