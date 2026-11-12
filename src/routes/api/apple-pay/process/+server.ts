@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import { error, json } from '@sveltejs/kit';
 import { decryptPaymentData, type ApplePayPaymentData } from '#lib/server/applepay/decrypt.ts';
 import type { ProcessResult } from '#lib/types.ts';
@@ -7,9 +8,9 @@ import type { RequestHandler } from './$types';
  * Receives the Apple Pay token and decrypts it, as a payment processor would.
  * No card is charged. Sensitive fields (DPAN, cryptogram) are never logged or returned.
  */
-export const POST: RequestHandler = async ({ request, platform }) => {
-	const env = platform?.env;
-	if (!env?.APPLE_PAY_PPC_PRIVATE_KEY) error(500, 'APPLE_PAY_PPC_PRIVATE_KEY secret is not set');
+export const POST: RequestHandler = async ({ request }) => {
+	// adapter-cloudflare v8 doesn't pass `platform`; bindings come from cloudflare:workers.
+	if (!env.APPLE_PAY_PPC_PRIVATE_KEY) error(500, 'APPLE_PAY_PPC_PRIVATE_KEY secret is not set');
 
 	const body = (await request.json().catch(() => null)) as {
 		token?: { paymentData?: ApplePayPaymentData; paymentMethod?: ApplePayJS.ApplePayPaymentMethod };

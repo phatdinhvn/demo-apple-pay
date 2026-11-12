@@ -1,11 +1,12 @@
+import { env } from 'cloudflare:workers';
 import { error, json } from '@sveltejs/kit';
 import { isAppleGatewayUrl } from '#lib/server/applepay/gateway.ts';
 import type { RequestHandler } from './$types';
 
 /** Merchant validation: Apple → (Safari) → us → Apple gateway over mutual TLS. */
-export const POST: RequestHandler = async ({ request, platform }) => {
-	const env = platform?.env;
-	if (!env?.APPLE_PAY_CERT) error(500, 'APPLE_PAY_CERT mTLS binding is not configured');
+export const POST: RequestHandler = async ({ request }) => {
+	// adapter-cloudflare v8 doesn't pass `platform`; bindings come from cloudflare:workers.
+	if (!env.APPLE_PAY_CERT) error(500, 'APPLE_PAY_CERT mTLS binding is not configured');
 
 	const { validationURL } = (await request.json().catch(() => ({}))) as { validationURL?: unknown };
 	if (!isAppleGatewayUrl(validationURL)) error(400, 'validationURL is not an Apple Pay gateway');
