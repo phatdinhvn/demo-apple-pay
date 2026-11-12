@@ -32,6 +32,25 @@
 		else steps.push({ id, label, status, detail });
 	}
 
+	/**
+	 * Apple's <apple-pay-button> stops click propagation, so Svelte's delegated
+	 * `onclick` (listening at the document root) never fires. Listen on the element itself.
+	 */
+	function directListeners(node: HTMLElement) {
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				pay();
+			}
+		};
+		node.addEventListener('click', pay);
+		node.addEventListener('keydown', onKey);
+		return () => {
+			node.removeEventListener('click', pay);
+			node.removeEventListener('keydown', onKey);
+		};
+	}
+
 	function pay() {
 		if (busy) return;
 		busy = true;
@@ -154,8 +173,7 @@
 						role="button"
 						tabindex="0"
 						aria-disabled={busy}
-						onclick={pay}
-						onkeydown={(e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && pay()}
+						{@attach directListeners}
 					></apple-pay-button>
 				{:else}
 					<p
